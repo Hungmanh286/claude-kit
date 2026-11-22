@@ -8,6 +8,7 @@
 # của shell: khi bạn gõ `claude` bên trong thư mục đó (hoặc thư mục con),
 # nó tự chạy `claude --add-dir <claude-kit>` để nạp skill, agent và
 # quy tắc chung. Ở ngoài thư mục đó, `claude` chạy như bình thường.
+# Script cũng đưa <claude-kit>/bin vào PATH để có lệnh `claude-kit update`.
 # Chạy lại để đổi thư mục; chạy với --uninstall để gỡ.
 # =====================================================================
 set -euo pipefail
@@ -69,6 +70,8 @@ touch "$RC"
 cat >> "$RC" <<RCEOF
 $START
 # claude-kit chỉ bật khi chạy claude bên trong: $WS
+export PATH="$KIT_DIR/bin:\$PATH"   # lệnh claude-kit (update, version)
+export CLAUDE_KIT_WS="$WS"
 claude() {
   case "\$PWD/" in
     "$WS/"*)
@@ -87,3 +90,4 @@ echo "✓ Đã thêm hàm claude vào $RC"
 echo
 echo "Chạy ngay:  source $RC"
 echo "Project mới: cd $WS/<project> && claude  →  /bootstrap"
+echo "Cập nhật kit: claude-kit update"

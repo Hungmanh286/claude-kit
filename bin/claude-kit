@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# =====================================================================
+# claude-kit — lệnh quản lý kit (install.sh đã đưa thư mục bin/ vào PATH).
+#
+#   claude-kit update    kéo bản mới nhất từ git, in các thay đổi
+#   claude-kit version   xem đang dùng bản nào, bật cho thư mục nào
+# =====================================================================
+set -euo pipefail
+
+# Thư mục kit = thư mục cha của bin/
+KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+git_kit() { git -C "$KIT_DIR" "$@"; }
+
+cmd_version() {
+  echo "claude-kit: $(git_kit log -1 --format='%h (%cs) %s')"
+  echo "Thư mục kit:        $KIT_DIR"
+  echo "Bật cho thư mục:    ${CLAUDE_KIT_WS:-(không rõ — cài bằng install.sh bản cũ)}"
+}
+
+cmd_update() {
+  # Có file trong kit bị sửa tay thì dừng, tránh xung đột hoặc mất thay đổi.
+  if [ -n "$(git_kit status --porcelain --untracked-files=no)" ]; then
+    echo "✗ Có file trong kit bị sửa tay, chưa cập nhật:" >&2
+    git_kit status --short --untracked-files=no >&2
+    echo "  Xem lại, rồi bỏ thay đổi bằng: git -C \"$KIT_DIR\" checkout -- <file>" >&2
+    exit 1
+  fi
+
+  local old new
+  old="$(git_kit rev-parse HEAD)"
+  echo "Đang cập nhật claude-kit ($KIT_DIR)..."
+  # --ff-only: chỉ cập nhật thẳng tới bản mới, không bao giờ tự tạo merge commit.
+  git_kit pull --ff-only --quiet
+  new="$(git_kit rev-parse HEAD)"
+
+  if [ "$old" = "$new" ]; then
+    echo "✓ Đã là bản mới nhất: $(git_kit log -1 --format='%h %s')"
+    return
+  fi
+
+  echo "Thay đổi mới:"
+  git_kit log --format='  %h %s' "$old..$new"
+
+  # install.sh đổi nghĩa là đoạn ghi vào file rc có thể đã khác: phải cài lại.
+  if ! git_kit diff --quiet "$old" "$new" -- install.sh; then
+    echo
+    echo "⚠ install.sh đã thay đổi, cần cài lại:"
+    echo "    $KIT_DIR/install.sh ${CLAUDE_KIT_WS:-<thư-mục-làm-việc>}"
+    echo "  rồi mở terminal mới (hoặc source file rc)."
+  fi
+  echo "✓ Xong. Mở phiên claude mới để nhận thay đổi."
+}
+
+case "${1:-}" in
+  update)  cmd_update ;;
+  version) cmd_version ;;
+  -h|--help|help)
+    echo "Cách dùng: claude-kit update | version" ;;
+  *)
+    echo "Cách dùng: claude-kit update | version" >&2
+    exit 1 ;;
+esac

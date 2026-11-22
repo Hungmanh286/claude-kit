@@ -73,8 +73,23 @@ Lưu ý:
 
 ## Cập nhật
 
-Sửa trong repo, commit, push; máy khác `git pull`. Không cần cài lại.
-Mở phiên Claude Code mới để nhận thay đổi.
+Sửa trong repo, commit, push. Trên server:
+
+```bash
+claude-kit update     # kéo bản mới (chỉ fast-forward), in các commit vừa nhận
+claude-kit version    # đang dùng bản nào, bật cho thư mục nào
+```
+
+Mở phiên Claude Code mới để nhận thay đổi. Nếu đợt cập nhật có sửa `install.sh`,
+lệnh sẽ in sẵn câu lệnh cài lại.
+
+Server cài từ trước khi có lệnh `claude-kit` (làm 1 lần):
+
+```bash
+git -C ~/claude-kit pull --ff-only
+~/claude-kit/install.sh ~/work        # cùng thư mục làm việc như lúc cài
+source ~/.bashrc                      # dùng zsh thì: source ~/.zshrc
+```
 
 ## Cấu trúc
 
@@ -83,6 +98,7 @@ CLAUDE.md                     quy tắc chung
 .claude/skills/<tên>/SKILL.md mỗi thư mục là một lệnh /<tên>
 .claude/agents/*.md           subagent
 install.sh                    bật kit cho 1 thư mục
+bin/claude-kit                lệnh claude-kit update / version
 ```
 
 Khi viết skill có lệnh `` !`...` `` (chạy trước, kết quả chèn vào prompt):
