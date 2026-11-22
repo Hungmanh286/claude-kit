@@ -31,6 +31,35 @@ cd ~/work/du-an-moi && claude
 
 Mỗi phiên: `/catchup` → làm việc → `/explain-diff` → commit → `/handoff` → `/clear`
 
+## Project Python dùng uv
+
+Nếu project quản lý bằng [uv](https://docs.astral.sh/uv/) thì tạo khung uv trước
+(để có `pyproject.toml`), rồi mới chạy `/bootstrap`:
+
+```bash
+cd ~/work/du-an-moi
+uv init          # bỏ qua nếu đã có pyproject.toml / uv.lock
+claude
+/bootstrap
+```
+
+`/bootstrap` đọc `pyproject.toml` và thấy `uv.lock` trong thư mục, nên sẽ ghi
+lệnh uv vào mục "Lệnh" trong `CLAUDE.md` của project, ví dụ:
+
+| Việc                     | Lệnh uv                  | Thay cho                          |
+|--------------------------|--------------------------|-----------------------------------|
+| Cài đặt                  | `uv sync`                | `pip install -r requirements.txt` |
+| Chạy                     | `uv run python main.py`  | `python main.py`                  |
+| Test                     | `uv run pytest`          | `pytest`                          |
+| Thêm thư viện            | `uv add <tên>`           | `pip install <tên>`               |
+| Thêm thư viện chỉ cho dev | `uv add --dev <tên>`    | (ghi tay vào requirements-dev)    |
+
+Lưu ý:
+- `uv run` tự dùng `.venv` của project, nên không cần `source .venv/bin/activate`.
+- Commit cả `pyproject.toml` và `uv.lock`, đưa `.venv/` vào `.gitignore`.
+- Nếu Claude vẫn dùng `pip`, kiểm tra mục "Lệnh" trong `CLAUDE.md` của project
+  đã ghi lệnh uv chưa.
+
 ## Đổi thư mục / gỡ
 
 ```bash
