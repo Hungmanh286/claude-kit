@@ -10,7 +10,7 @@ Kit **chỉ được bật trong một thư mục bạn chọn**, không ghi gì
 ```bash
 git clone <url-repo> ~/claude-kit
 ~/claude-kit/install.sh ~/work        # thay ~/work bằng thư mục của bạn
-source ~/.bashrc
+source ~/.bashrc                      # dùng zsh thì: source ~/.zshrc
 ```
 
 Khi gõ `claude` trong `~/work` hoặc thư mục con, hàm shell tự chạy
@@ -30,6 +30,10 @@ cd ~/work/du-an-moi && claude
 ```
 
 Mỗi phiên: `/catchup` → làm việc → `/explain-diff` → commit → `/handoff` → `/clear`
+
+- Trong lúc làm, Claude tự gọi subagent `reviewer` sau mỗi bước implement đáng kể
+  (review chạy trong context riêng, chỉ ~15 dòng kết quả quay về phiên chính).
+- Gõ `/context` bất cứ lúc nào để xem cái gì đang chiếm context.
 
 ## Project Python dùng uv
 
@@ -80,3 +84,8 @@ CLAUDE.md                     quy tắc chung
 .claude/agents/*.md           subagent
 install.sh                    bật kit cho 1 thư mục
 ```
+
+Khi viết skill có lệnh `` !`...` `` (chạy trước, kết quả chèn vào prompt):
+- Khai báo lệnh trong `allowed-tools`, nếu không skill bị huỷ khi chạy ngoài auto mode.
+- Lệnh có thể lỗi (vd `git diff HEAD` khi repo chưa có commit) phải thêm
+  `|| echo "..."`, vì lệnh thoát với mã ≥ 2 sẽ huỷ cả skill.

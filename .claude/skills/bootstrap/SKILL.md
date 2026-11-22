@@ -2,6 +2,7 @@
 name: bootstrap
 description: Khởi tạo bộ khung làm việc cho project (CLAUDE.md, docs/PROGRESS.md, docs/ARCHITECTURE.md, docs/decisions/). Dùng cho project mới hoặc project chưa có các file này.
 disable-model-invocation: true
+allowed-tools: Bash(ls *), Bash(git log *)
 ---
 # Bootstrap project
 
